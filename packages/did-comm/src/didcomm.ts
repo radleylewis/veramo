@@ -97,6 +97,7 @@ import {
   _FlattenedJWS,
   _GenericJWS,
 } from './types/utility-types.js'
+import { constants } from 'crypto'
 
 const debug = Debug('veramo:did-comm:action-handler')
 
@@ -177,7 +178,10 @@ export class DIDComm implements IAgentPlugin {
    * @param transports - A list of {@link IDIDCommTransport} objects. Defaults to
    *   {@link @veramo/did-comm#DIDCommHttpTransport | DIDCommHttpTransport}
    */
-  constructor(transports: IDIDCommTransport[] = [new DIDCommHttpTransport()]) {
+  constructor(
+    transports: IDIDCommTransport[] = [new DIDCommHttpTransport()],
+    isMediateDefaultGrantAll = true,
+  ) {
     this.transports = transports
     this.methods = {
       sendMessageDIDCommAlpha1: this.sendMessageDIDCommAlpha1.bind(this),
@@ -185,6 +189,7 @@ export class DIDComm implements IAgentPlugin {
       unpackDIDCommMessage: this.unpackDIDCommMessage.bind(this),
       packDIDCommMessage: this.packDIDCommMessage.bind(this),
       sendDIDCommMessage: this.sendDIDCommMessage.bind(this),
+      isMediateDefaultGrantAll: () => Promise.resolve(isMediateDefaultGrantAll),
     }
   }
 
@@ -422,7 +427,8 @@ export class DIDComm implements IAgentPlugin {
                 recipient.publicKeyBytes,
                 <ECDH>senderECDH,
                 { kid: recipient.kid },
-            )} else if (options?.alg?.endsWith('+A256KW')) {
+              )
+            } else if (options?.alg?.endsWith('+A256KW')) {
               // FIXME: the didcomm spec actually links to ECDH-1PU(v4)
               return xc20pAuthEncrypterEcdh1PuV3x25519WithA256KW(recipient.publicKeyBytes, <ECDH>senderECDH, {
                 kid: recipient.kid,
