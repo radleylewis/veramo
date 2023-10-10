@@ -14,6 +14,7 @@ import {
   IDataStoreSaveVerifiableCredentialArgs,
   IDataStoreSaveVerifiablePresentationArgs,
   IIdentifier,
+  IMediation,
   IMessage,
   TClaimsColumns,
   TCredentialColumns,
@@ -88,6 +89,7 @@ export class DataStoreJson implements IAgentPlugin {
       dataStoreSaveVerifiablePresentation: this.dataStoreSaveVerifiablePresentation.bind(this),
       dataStoreGetVerifiablePresentation: this.dataStoreGetVerifiablePresentation.bind(this),
       dataStoreSaveMediation: this.dataStoreSaveMediation.bind(this),
+      dataStoreGetMediation: this.dataStoreGetMediation.bind(this),
       // dataStoreAddRecipientDid: this.dataStoreAddRecipientDid.bind(this),
       // dataStoreRemoveRecipientDid: this.dataStoreRemoveRecipientDid.bind(this),
       // dataStoreListRecipientDids: this.dataStoreListRecipientDids.bind(this),
@@ -146,10 +148,16 @@ export class DataStoreJson implements IAgentPlugin {
     }
   }
 
-  async dataStoreSaveMediation(args: IDataStoreSaveMediationArgs): Promise<string> {
-    const mediation = this.cacheTree.mediation[args.did]
-    if (!mediation) throw Error('Message not found')
-    return mediation.did
+  async dataStoreSaveMediation({ did, status }: IDataStoreSaveMediationArgs): Promise<string> {
+    this.cacheTree.mediation[did] = { did, status }
+    return did
+  }
+
+  async dataStoreGetMediation(args: IDataStoreSaveMediationArgs): Promise<IMediation> {
+    const mediation  = this.cacheTree.mediation[args.did]
+    if (!mediation) throw Error('Mediation not found')
+    return mediation
+
   }
 
   async dataStoreDeleteMessage(args: IDataStoreDeleteMessageArgs): Promise<boolean> {
