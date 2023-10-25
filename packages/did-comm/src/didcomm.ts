@@ -147,7 +147,7 @@ export interface IPackDIDCommMessageArgs {
  *
  * @beta This API may change without a BREAKING CHANGE notice.
  */
-export interface DIDCOmmConfig<T = IDIDCommTransport> {
+export interface DIDCOmmConfig<T extends IDIDCommTransport = DIDCommHttpTransport> {
   transports?: T[]
   isMediateDefaultGrantAll?: boolean
 }
