@@ -143,6 +143,16 @@ export interface IPackDIDCommMessageArgs {
 }
 
 /**
+ * The config for the {@link DIDComm} DIDComm plugin.
+ *
+ * @beta This API may change without a BREAKING CHANGE notice.
+ */
+export interface DIDCOmmConfig<T = IDIDCommTransport> {
+  transports?: T[]
+  isMediateDefaultGrantAll?: boolean
+}
+
+/**
  * The input to the {@link DIDComm.sendDIDCommMessage} method.
  * The provided `messageId` will be used in the emitted
  * event to allow event/message correlation.
@@ -178,10 +188,10 @@ export class DIDComm implements IAgentPlugin {
    * @param transports - A list of {@link IDIDCommTransport} objects. Defaults to
    *   {@link @veramo/did-comm#DIDCommHttpTransport | DIDCommHttpTransport}
    */
-  constructor(
-    transports: IDIDCommTransport[] = [new DIDCommHttpTransport()],
+  constructor({
+    transports = [new DIDCommHttpTransport()],
     isMediateDefaultGrantAll = true,
-  ) {
+  }: DIDCOmmConfig = {}) {
     this.transports = transports
     this.methods = {
       sendMessageDIDCommAlpha1: this.sendMessageDIDCommAlpha1.bind(this),
