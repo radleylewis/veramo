@@ -8,7 +8,6 @@ import type {
   IMessageHandler,
   IResolver,
 } from '@veramo/core-types'
-import { KeyValueStore } from 'kv-store'
 import {
   createJWE,
   type Decrypter,
@@ -98,7 +97,6 @@ import {
   _FlattenedJWS,
   _GenericJWS,
 } from './types/utility-types.js'
-import { constants } from 'crypto'
 
 const debug = Debug('veramo:did-comm:action-handler')
 
@@ -179,7 +177,6 @@ export interface ISendDIDCommMessageArgs {
  */
 export class DIDComm implements IAgentPlugin {
   readonly transports: IDIDCommTransport[]
-  readonly store: KeyValueStore
 
   /** Plugin methods */
   readonly methods: IDIDComm
@@ -193,7 +190,6 @@ export class DIDComm implements IAgentPlugin {
   constructor({
     transports = [new DIDCommHttpTransport()],
     isMediateDefaultGrantAll = true,
-    store = new KeyValueStore(),
   }: DIDCOmmConfig = {}) {
     this.transports = transports
     this.methods = {
