@@ -100,14 +100,6 @@ export interface IDIDComm extends IPluginMethodMap {
   sendDIDCommMessage(args: ISendDIDCommMessageArgs, context: IAgentContext<IResolver>): Promise<string>
 
   /**
-   * @returns a boolean indicating whether the default mediation policy is to grant all or deny all
-   * by default.
-   *
-   * @beta This API may change without a BREAKING CHANGE notice.
-   */
-  isMediateDefaultGrantAll(): Promise<boolean>
-
-  /**
    *
    * @deprecated Please use {@link IDIDComm.sendDIDCommMessage} instead. This will be removed in Veramo 4.0
    *

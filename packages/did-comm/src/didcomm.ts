@@ -146,9 +146,8 @@ export interface IPackDIDCommMessageArgs {
  *
  * @beta This API may change without a BREAKING CHANGE notice.
  */
-export interface DIDCOmmConfig<T extends IDIDCommTransport = DIDCommHttpTransport> {
+export interface DIDCommConfig<T extends IDIDCommTransport = DIDCommHttpTransport> {
   transports?: T[]
-  isMediateDefaultGrantAll?: boolean
 }
 
 /**
@@ -187,10 +186,7 @@ export class DIDComm implements IAgentPlugin {
    * @param transports - A list of {@link IDIDCommTransport} objects. Defaults to
    *   {@link @veramo/did-comm#DIDCommHttpTransport | DIDCommHttpTransport}
    */
-  constructor({
-    transports = [new DIDCommHttpTransport()],
-    isMediateDefaultGrantAll = true,
-  }: DIDCOmmConfig = {}) {
+  constructor({ transports = [new DIDCommHttpTransport()] }: DIDCommConfig = {}) {
     this.transports = transports
     this.methods = {
       sendMessageDIDCommAlpha1: this.sendMessageDIDCommAlpha1.bind(this),
@@ -198,7 +194,6 @@ export class DIDComm implements IAgentPlugin {
       unpackDIDCommMessage: this.unpackDIDCommMessage.bind(this),
       packDIDCommMessage: this.packDIDCommMessage.bind(this),
       sendDIDCommMessage: this.sendDIDCommMessage.bind(this),
-      isMediateDefaultGrantAll: () => Promise.resolve(isMediateDefaultGrantAll),
     }
   }
 
