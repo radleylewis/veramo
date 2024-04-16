@@ -443,8 +443,8 @@ export class IonDIDProvider extends AbstractIdentifierProvider {
     const type = options?.type
       ? options.type
       : options?.key?.type
-      ? (options.key.type as KeyType)
-      : KeyType.Secp256k1
+        ? (options.key.type as KeyType)
+        : KeyType.Secp256k1
 
     const meta = options?.key?.meta ? options.key.meta : {}
     const ionMeta: IonKeyMetadata = {
