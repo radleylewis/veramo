@@ -11,14 +11,14 @@ export abstract class AbstractIdentifierProvider {
   ): Promise<Omit<IIdentifier, 'provider'>>
 
   abstract updateIdentifier?(
-    args: { did: string, document: Partial<DIDDocument>, options?: { [x: string]: any } },
+    args: { did: string; document: Partial<DIDDocument>; options?: { [x: string]: any } },
     context: IAgentContext<IKeyManager>,
   ): Promise<IIdentifier>
 
   abstract deleteIdentifier(args: IIdentifier, context: IAgentContext<IKeyManager>): Promise<boolean>
 
   abstract addKey(
-    args: { identifier: IIdentifier; key: IKey; options?: any },
+    args: { identifier: IIdentifier; key: IKey; options?: Record<string, any> & { signOnly?: boolean } },
     context: IAgentContext<IKeyManager>,
   ): Promise<any>
 

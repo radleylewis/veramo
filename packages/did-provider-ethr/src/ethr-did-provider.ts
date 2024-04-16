@@ -46,6 +46,7 @@ export interface TransactionOptions extends TransactionRequest {
   ttl?: number
   encoding?: string
   metaIdentifierKeyId?: string
+  signOnly?: boolean
 }
 
 /**
@@ -106,6 +107,14 @@ export interface EthrNetworkConfiguration {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [index: string]: any
 }
+
+type TxnParams = [
+  attrName: string,
+  attrValue: string,
+  ttl: number,
+  signature: { sigV: number; sigR: string; sigS: string },
+  options: Record<string, any>,
+]
 
 /**
  * {@link @veramo/did-manager#DIDManager} identifier provider for `did:ethr` identifiers
@@ -182,17 +191,17 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     { kms, options }: { kms?: string; options?: CreateDidEthrOptions },
     context: IRequiredContext,
   ): Promise<Omit<IIdentifier, 'provider'>> {
-    const key = await context.agent.keyManagerCreate({kms: kms || this.defaultKms, type: 'Secp256k1'})
+    const key = await context.agent.keyManagerCreate({ kms: kms || this.defaultKms, type: 'Secp256k1' })
     const compressedPublicKey = SigningKey.computePublicKey(`0x${key.publicKeyHex}`, true)
 
     let networkSpecifier
-    if(options?.network) {
-      if(typeof options.network === 'number') {
+    if (options?.network) {
+      if (typeof options.network === 'number') {
         networkSpecifier = BigInt(options?.network)
       } else {
         networkSpecifier = options?.network
       }
-    } else if(options?.providerName?.match(/^did:ethr:.+$/)) {
+    } else if (options?.providerName?.match(/^did:ethr:.+$/)) {
       networkSpecifier = options?.providerName?.substring(9)
     } else {
       networkSpecifier = undefined
@@ -206,9 +215,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     }
     if (typeof networkSpecifier === 'bigint' || typeof networkSpecifier === 'number') {
       networkSpecifier =
-        network.name && network.name.length > 0
-          ? network.name
-          : BigInt(options?.network || 1).toString(16)
+        network.name && network.name.length > 0 ? network.name : BigInt(options?.network || 1).toString(16)
     }
     const networkString = networkSpecifier && networkSpecifier !== 'mainnet' ? `${networkSpecifier}:` : ''
     const identifier: Omit<IIdentifier, 'provider'> = {
@@ -236,20 +243,20 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
-  private getNetworkFor(networkSpecifier: string | number | bigint | undefined): EthrNetworkConfiguration | undefined {
+  private getNetworkFor(
+    networkSpecifier: string | number | bigint | undefined,
+  ): EthrNetworkConfiguration | undefined {
     let networkNameOrId: string | number | bigint = networkSpecifier || 'mainnet'
-    let network = this.networks.find(
-      (n) => {
-        if(n.chainId) {
-          if(typeof networkSpecifier === 'bigint') {
-            if(BigInt(n.chainId) === networkNameOrId) return n
-          } else {
-            if(n.chainId === networkNameOrId) return n
-          }
+    let network = this.networks.find((n) => {
+      if (n.chainId) {
+        if (typeof networkSpecifier === 'bigint') {
+          if (BigInt(n.chainId) === networkNameOrId) return n
+        } else {
+          if (n.chainId === networkNameOrId) return n
         }
-        if(n.name === networkNameOrId || n.description === networkNameOrId) return n
-      },
-    )
+      }
+      if (n.name === networkNameOrId || n.description === networkNameOrId) return n
+    })
     if (!network && !networkSpecifier && this.networks.length === 1) {
       network = this.networks[0]
     }
@@ -278,7 +285,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       throw new Error(`invalid_argument: cannot find network for ${identifier.did}`)
     }
 
-    if(!network.provider) {
+    if (!network.provider) {
       throw new Error(`Provider was not found for network ${identifier.did}`)
     }
 
@@ -323,7 +330,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
   async addKey(
     { identifier, key, options }: { identifier: IIdentifier; key: IKey; options?: TransactionOptions },
     context: IRequiredContext,
-  ): Promise<any> {
+  ): Promise<string | TxnParams> {
     const ethrDid = await this.getEthrDidController(identifier, context)
     const usg = key.type === 'X25519' ? 'enc' : 'veriKey'
     const encoding = key.type === 'X25519' ? 'base58' : options?.encoding || 'hex'
@@ -334,20 +341,19 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     if (options?.metaIdentifierKeyId) {
       const metaHash = await ethrDid.createSetAttributeHash(attrName, attrValue, ttl)
       const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, identifier, metaHash)
-
       const metaEthrDid = await this.getEthrDidController(identifier, context, options.metaIdentifierKeyId!)
       debug('ethrDid.addKeySigned %o', { attrName, attrValue, ttl, gasLimit })
       delete options.metaIdentifierKeyId
-      const txHash = await metaEthrDid.setAttributeSigned(
+      const txnParams: TxnParams = [
         attrName,
         attrValue,
         ttl,
         { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
-        {
-          ...options,
-          gasLimit,
-        },
-      )
+        { ...options, gasLimit },
+      ]
+
+      if (options.signOnly) return txnParams
+      const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
       debug(`ethrDid.addKeySigned tx = ${txHash}`)
       return txHash
     } else {

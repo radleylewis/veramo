@@ -171,7 +171,7 @@ export interface IDIDManagerAddKeyArgs {
   /**
    * Optional. Identifier provider specific options
    */
-  options?: object
+  options?: Record<string, any> & { signOnly?: boolean }
 }
 
 /**
