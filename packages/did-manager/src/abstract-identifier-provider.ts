@@ -22,6 +22,20 @@ export abstract class AbstractIdentifierProvider {
     context: IAgentContext<IKeyManager>,
   ): Promise<any>
 
+  abstract submitTransaction(
+    args: {
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<any>
+
   abstract removeKey(
     args: { identifier: IIdentifier; kid: string; options?: any },
     context: IAgentContext<IKeyManager>,

@@ -153,7 +153,20 @@ export interface IDIDManagerUpdateArgs {
   }
 }
 
-/**
+type TxnParams = [
+  attrName: string,
+  attrValue: string,
+  ttl: number,
+  signature: { sigV: number; sigR: string; sigS: string },
+  options: Record<string, any>,
+]
+
+export interface IDIDManagerSubmitTransactionArgs {
+  txnParams: TxnParams,
+  provider: string,
+}
+
+/*
  * Input arguments for {@link IDIDManager.didManagerAddKey | didManagerAddKey}
  * @public
  */

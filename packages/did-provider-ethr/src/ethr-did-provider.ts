@@ -353,6 +353,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       ]
 
       if (options.signOnly) return txnParams
+
       const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
       debug(`ethrDid.addKeySigned tx = ${txHash}`)
       return txHash

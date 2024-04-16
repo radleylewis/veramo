@@ -20,6 +20,7 @@ import {
   MinimalImportableIdentifier,
   IKey,
   IService,
+  IDIDManagerSubmitTransactionArgs,
 } from '@veramo/core-types'
 import { schema } from '@veramo/core-types'
 import { AbstractDIDStore } from './abstract-identifier-store.js'
@@ -214,6 +215,14 @@ export class DIDManager implements IAgentPlugin {
     const provider = this.getProvider(identifier.provider)
     await provider.deleteIdentifier(identifier, context)
     return this.store.deleteDID({ did })
+  }
+
+  /** {@inheritDoc @veramo/core-types#IDIDManager.didManagerSubmitTxn} */
+  async didManagerSubmitTxn(
+    { txnParams, provider }: IDIDManagerSubmitTransactionArgs,
+    context: IAgentContext<IKeyManager>,
+  ): Promise<any> {
+    return this.getProvider(provider).submitTransaction({ txnParams, provider }, context)
   }
 
   /** {@inheritDoc @veramo/core-types#IDIDManager.didManagerAddKey} */
