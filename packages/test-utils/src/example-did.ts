@@ -47,7 +47,10 @@ export class ExampleDidProvider extends AbstractIdentifierProvider {
     return identifier
   }
 
-  async updateIdentifier(args: { did: string; kms?: string | undefined; alias?: string | undefined; options?: any }, context: IAgentContext<IKeyManager>): Promise<IIdentifier> {
+  async updateIdentifier(
+    args: { did: string; kms?: string | undefined; alias?: string | undefined; options?: any },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<IIdentifier> {
     throw new Error('FakeDIDProvider updateIdentifier not supported yet.')
   }
 
@@ -56,6 +59,23 @@ export class ExampleDidProvider extends AbstractIdentifierProvider {
       await context.agent.keyManagerDelete({ kid })
     }
     return true
+  }
+
+  async submitTransaction(
+    args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<any> {
+    throw new Error('FakeDIDProvider submitTransaction not supported yet.')
   }
 
   async addKey(

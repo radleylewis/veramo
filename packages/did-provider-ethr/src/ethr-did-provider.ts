@@ -327,6 +327,15 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     }
   }
 
+  async submitTransaction(
+    { txnParams, identifier }: { identifier: IIdentifier; txnParams: TxnParams },
+    context: IRequiredContext,
+  ): Promise<any> {
+    const metaEthrDid = await this.getEthrDidController(identifier, context)
+    const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
+    return txHash
+  }
+
   async addKey(
     { identifier, key, options }: { identifier: IIdentifier; key: IKey; options?: TransactionOptions },
     context: IRequiredContext,

@@ -162,8 +162,9 @@ type TxnParams = [
 ]
 
 export interface IDIDManagerSubmitTransactionArgs {
-  txnParams: TxnParams,
-  provider: string,
+  txnParams: TxnParams
+  provider: string
+  did: string
 }
 
 /*

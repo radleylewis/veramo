@@ -24,6 +24,7 @@ export abstract class AbstractIdentifierProvider {
 
   abstract submitTransaction(
     args: {
+      identifier: IIdentifier
       txnParams: [
         attrName: string,
         attrValue: string,

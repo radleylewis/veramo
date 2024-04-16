@@ -76,6 +76,23 @@ export class JwkDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  async submitTransaction(
+    args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    context: IContext,
+  ): Promise<any> {
+    throw new Error('not_supported: JwkDIDProvider submitTransaction not possible')
+  }
+
   async addKey(
     { identifier, key, options }: { identifier: IIdentifier; key: IKey; options?: any },
     context: IContext,
@@ -118,3 +135,4 @@ export class JwkDIDProvider extends AbstractIdentifierProvider {
     })
   }
 }
+
