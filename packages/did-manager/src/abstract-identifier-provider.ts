@@ -33,6 +33,7 @@ export abstract class AbstractIdentifierProvider {
         options: Record<string, any>,
       ]
       provider: string
+      principalDid?: string
     },
     context: IAgentContext<IKeyManager>,
   ): Promise<any>

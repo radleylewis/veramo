@@ -220,11 +220,14 @@ export class DIDManager implements IAgentPlugin {
 
   /** {@inheritDoc @veramo/core-types#IDIDManager.didManagerSubmitTxn} */
   async didManagerSubmitTxn(
-    { txnParams, provider, did }: IDIDManagerSubmitTransactionArgs,
+    { txnParams, provider, agentDid, principalDid }: IDIDManagerSubmitTransactionArgs,
     context: IAgentContext<IKeyManager>,
   ): Promise<any> {
-    const identifier = await this.store.getDID({ did })
-    return this.getProvider(provider).submitTransaction({ identifier, txnParams, provider }, context)
+    const identifier = await this.store.getDID({ did: agentDid })
+    return this.getProvider(provider).submitTransaction(
+      { identifier, txnParams, provider, principalDid },
+      context,
+    )
   }
 
   /** {@inheritDoc @veramo/core-types#IDIDManager.didManagerAddKey} */

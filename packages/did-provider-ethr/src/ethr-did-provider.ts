@@ -270,6 +270,27 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     return network
   }
 
+  private async getEthrDidProxyController(
+    identifier: IIdentifier,
+    context: IRequiredContext,
+    metaIdentifierKeyId: string,
+    principalDid: string,
+  ): Promise<EthrDID> {
+    const networkStringMatcher = /^did:ethr(:.+)?:(0x[0-9a-fA-F]{40}|0x[0-9a-fA-F]{66}).*$/
+    const matches = identifier.did.match(networkStringMatcher)
+    const network = this.getNetworkFor(matches?.[1]?.substring(1))
+    const metaControllerKey = await context.agent.keyManagerGet({ kid: metaIdentifierKeyId })
+    if (!network || !metaControllerKey) throw new Error(`invalid_argument: controller key or network error`)
+    return new EthrDID({
+      identifier: principalDid,
+      provider: network.provider,
+      chainNameOrId: network.name || network.chainId,
+      rpcUrl: network.rpcUrl,
+      registry: network.registry,
+      txSigner: new KmsEthereumSigner(metaControllerKey, context, network?.provider),
+    })
+  }
+
   private async getEthrDidController(
     identifier: IIdentifier,
     context: IRequiredContext,
@@ -335,10 +356,28 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
   }
 
   async submitTransaction(
-    { txnParams, identifier }: { identifier: IIdentifier; txnParams: AddTxnParams },
+    {
+      txnParams,
+      identifier,
+      principalDid,
+    }: { identifier: IIdentifier; txnParams: AddTxnParams; principalDid?: string },
     context: IRequiredContext,
   ): Promise<any> {
-    const metaEthrDid = await this.getEthrDidController(identifier, context)
+    const metaIdentifierKeyId = identifier.keys.find((k) =>
+      k.meta?.algorithms?.includes('eth_signTransaction'),
+    )?.kid
+    if (!principalDid) {
+      throw new Error('invalid_argument: principalDid is required')
+    }
+    if (!metaIdentifierKeyId) {
+      throw new Error('invalid_argument: metaIdentifierKeyId is not managed by this agent')
+    }
+    const metaEthrDid = await this.getEthrDidProxyController(
+      identifier,
+      context,
+      metaIdentifierKeyId,
+      principalDid,
+    )
     const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
     return txHash
   }
