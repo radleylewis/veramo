@@ -61,6 +61,7 @@ export class DIDManager implements IAgentPlugin {
       didManagerImport: this.didManagerImport.bind(this),
       didManagerDelete: this.didManagerDelete.bind(this),
       didManagerAddKey: this.didManagerAddKey.bind(this),
+      didManagerSubmitTxn: this.didManagerSubmitTxn.bind(this),
       didManagerRemoveKey: this.didManagerRemoveKey.bind(this),
       didManagerAddService: this.didManagerAddService.bind(this),
       didManagerRemoveService: this.didManagerRemoveService.bind(this),
