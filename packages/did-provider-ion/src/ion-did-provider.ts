@@ -175,10 +175,10 @@ export class IonDIDProvider extends AbstractIdentifierProvider {
   }
 
   /**
-   * @remarks This method has not yet been implemented for PeerDIDProvider
+   * @remarks This method has not yet been implemented for IonDIDProvider
    **/
   async submitTransaction(
-    args: {
+    _args: {
       identifier: IIdentifier
       txnParams: [
         attrName: string,
@@ -189,7 +189,7 @@ export class IonDIDProvider extends AbstractIdentifierProvider {
       ]
       provider: string
     },
-    context: IContext,
+    _context: IContext,
   ): Promise<any> {
     throw new Error('not_supported: IonDIDProvider submitTransaction not supported yet.')
   }
