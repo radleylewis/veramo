@@ -128,8 +128,11 @@ export class PeerDIDProvider extends AbstractIdentifierProvider {
     }
   }
 
+  /**
+   * @remarks This method has not yet been implemented for PeerDIDProvider
+   **/
   async submitTransaction(
-    args: {
+    _args: {
       identifier: IIdentifier
       txnParams: [
         attrName: string,
@@ -140,7 +143,7 @@ export class PeerDIDProvider extends AbstractIdentifierProvider {
       ]
       provider: string
     },
-    context: IAgentContext<IKeyManager>,
+    _context: IAgentContext<IKeyManager>,
   ): Promise<any> {
     throw new Error('not_supported: PeerDIDProvider submitTransaction not supported yet.')
   }

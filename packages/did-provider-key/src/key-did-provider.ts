@@ -85,8 +85,11 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  /**
+   * @remarks This method has not yet been implemented for KeyDIDProvider
+   **/
   async submitTransaction(
-    args: {
+    _args: {
       identifier: IIdentifier
       txnParams: [
         attrName: string,

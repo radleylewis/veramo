@@ -354,7 +354,21 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     const attrValue = '0x' + key.publicKeyHex
     const ttl = options?.ttl || this.ttl || 86400
     const gasLimit = options?.gasLimit || this.gas || DEFAULT_GAS_LIMIT
-    if (options?.metaIdentifierKeyId) {
+    if (options?.signOnly) {
+      const metaHash = await ethrDid.createSetAttributeHash(attrName, attrValue, ttl)
+      const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, identifier, metaHash)
+      debug('ethrDid.addKeySigned %o', { attrName, attrValue, ttl, gasLimit })
+      delete options.metaIdentifierKeyId
+      const txnParams: AddTxnParams = [
+        attrName,
+        attrValue,
+        ttl,
+        { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
+        { ...options, gasLimit },
+      ]
+      debug('ethrDid.addKeySigned: returning TransactionParams')
+      return txnParams
+    } else if (options?.metaIdentifierKeyId) {
       const metaHash = await ethrDid.createSetAttributeHash(attrName, attrValue, ttl)
       const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, identifier, metaHash)
       const metaEthrDid = await this.getEthrDidController(identifier, context, options.metaIdentifierKeyId!)
@@ -367,9 +381,6 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
         { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
         { ...options, gasLimit },
       ]
-
-      if (options.signOnly) return txnParams
-
       const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
       debug(`ethrDid.addKeySigned tx = ${txHash}`)
       return txHash

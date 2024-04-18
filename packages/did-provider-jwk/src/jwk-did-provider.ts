@@ -76,8 +76,11 @@ export class JwkDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  /**
+   * @remarks This method has not yet been implemented for JwkDIDProvider
+   **/
   async submitTransaction(
-    args: {
+    _args: {
       identifier: IIdentifier
       txnParams: [
         attrName: string,
@@ -88,7 +91,7 @@ export class JwkDIDProvider extends AbstractIdentifierProvider {
       ]
       provider: string
     },
-    context: IContext,
+    _context: IContext,
   ): Promise<any> {
     throw new Error('not_supported: JwkDIDProvider submitTransaction not possible')
   }

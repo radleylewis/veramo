@@ -113,6 +113,9 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  /**
+   * @remarks This method has not yet been implemented for PkhDIDProvider
+   **/
   async submitTransaction(
     {
       identifier,

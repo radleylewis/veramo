@@ -174,6 +174,9 @@ export class IonDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  /**
+   * @remarks This method has not yet been implemented for PeerDIDProvider
+   **/
   async submitTransaction(
     args: {
       identifier: IIdentifier

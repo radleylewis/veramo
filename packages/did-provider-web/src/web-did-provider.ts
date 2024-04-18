@@ -49,8 +49,11 @@ export class WebDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  /**
+   * @remarks This method has not yet been implemented for WebDIDProvider
+   **/
   async submitTransaction(
-    args: {
+    _args: {
       identifier: IIdentifier
       txnParams: [
         attrName: string,
@@ -61,7 +64,7 @@ export class WebDIDProvider extends AbstractIdentifierProvider {
       ]
       provider: string
     },
-    context: IContext,
+    _context: IContext,
   ): Promise<any> {
     throw new Error('not_supported: WebDIDProvider submitTransaction not supported yet.')
   }
