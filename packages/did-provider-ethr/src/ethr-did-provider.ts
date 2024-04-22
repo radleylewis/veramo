@@ -458,7 +458,21 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
 
     debug('ethrDid.setAttribute %o', { attrName, attrValue, ttl, gasLimit })
 
-    if (options?.metaIdentifierKeyId) {
+    if (options?.signOnly) {
+      const metaHash = await ethrDid.createSetAttributeHash(attrName, attrValue, ttl)
+      const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, identifier, metaHash)
+      debug('ethrDid.addServiceSigned %o', { attrName, attrValue, ttl, gasLimit })
+      delete options.metaIdentifierKeyId
+      const txnParams: AddTxnParams = [
+        attrName,
+        attrValue,
+        ttl,
+        { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
+        { ...options, gasLimit },
+      ]
+      debug('ethrDid.addServiceSigned: signing only. Returning TransactionParams')
+      return txnParams
+    } else if (options?.metaIdentifierKeyId) {
       const metaHash = await ethrDid.createSetAttributeHash(attrName, attrValue, ttl)
       const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, identifier, metaHash)
 
@@ -472,7 +486,6 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
         { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
         { ...options, gasLimit },
       ]
-      if (options.signOnly) return txnParams
       const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
       debug(`ethrDid.addServiceSigned tx = ${txHash}`)
       return txHash
@@ -501,7 +514,19 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     const attrValue = '0x' + key.publicKeyHex
     const gasLimit = args.options?.gasLimit || this.gas || DEFAULT_GAS_LIMIT
 
-    if (args.options?.metaIdentifierKeyId) {
+    if (args.options?.signOnly) {
+      const metaHash = await ethrDid.createRevokeAttributeHash(attrName, attrValue)
+      const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, args.identifier, metaHash)
+      debug('ethrDid.revokeAttributeSigned %o', { attrName, attrValue, gasLimit })
+      const txnParams: RemoveTxnParams = [
+        attrName,
+        attrValue,
+        { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
+        { ...args.options, gasLimit },
+      ]
+      debug('ethrDid.revokeAttributeSigned: signing only. Returning TransactionParams')
+      return txnParams
+    } else if (args.options?.metaIdentifierKeyId) {
       const metaHash = await ethrDid.createRevokeAttributeHash(attrName, attrValue)
       const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, args.identifier, metaHash)
 
@@ -548,7 +573,19 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
         : JSON.stringify(service.serviceEndpoint)
     const gasLimit = args.options?.gasLimit || this.gas || DEFAULT_GAS_LIMIT
 
-    if (args.options?.metaIdentifierKeyId) {
+    if (args.options?.signOnly) {
+      const metaHash = await ethrDid.createRevokeAttributeHash(attrName, attrValue)
+      const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, args.identifier, metaHash)
+      debug('ethrDid.revokeAttributeSigned %o', { attrName, attrValue, gasLimit })
+      const txnParams: RemoveTxnParams = [
+        attrName,
+        attrValue,
+        { sigV: canonicalSignature.v, sigR: canonicalSignature.r, sigS: canonicalSignature.s },
+        { ...args.options, gasLimit },
+      ]
+      debug('ethrDid.revokeAttributeSigned: signing only. Returning TransactionParams')
+      return txnParams
+    } else if (args.options?.metaIdentifierKeyId) {
       const metaHash = await ethrDid.createRevokeAttributeHash(attrName, attrValue)
       const canonicalSignature = await EthrDIDProvider.createMetaSignature(context, args.identifier, metaHash)
 
