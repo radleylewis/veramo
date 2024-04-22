@@ -282,9 +282,6 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     console.log('network', network)
     const metaControllerKey = await context.agent.keyManagerGet({ kid: metaIdentifierKeyId })
     if (!network || !metaControllerKey) throw new Error(`invalid_argument: controller key or network error`)
-    /**
-     * TODO: make the did chainId/name consistent across the snap and the tspn
-     **/
     return new EthrDID({
       identifier: principalDid,
       provider: network.provider,
