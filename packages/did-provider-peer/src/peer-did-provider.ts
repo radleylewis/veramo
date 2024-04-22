@@ -128,6 +128,26 @@ export class PeerDIDProvider extends AbstractIdentifierProvider {
     }
   }
 
+  /**
+   * @remarks This method has not yet been implemented for PeerDIDProvider
+   **/
+  async submitTransaction(
+    _args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    _context: IAgentContext<IKeyManager>,
+  ): Promise<any> {
+    throw new Error('not_supported: PeerDIDProvider submitTransaction not supported yet.')
+  }
+
   async updateIdentifier(
     args: { did: string; kms?: string | undefined; alias?: string | undefined; options?: any },
     context: IAgentContext<IKeyManager>,

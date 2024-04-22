@@ -35,7 +35,10 @@ export class WebDIDProvider extends AbstractIdentifierProvider {
     return identifier
   }
 
-  async updateIdentifier(args: { did: string; kms?: string | undefined; alias?: string | undefined; options?: any }, context: IAgentContext<IKeyManager>): Promise<IIdentifier> {
+  async updateIdentifier(
+    args: { did: string; kms?: string | undefined; alias?: string | undefined; options?: any },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<IIdentifier> {
     throw new Error('WebDIDProvider updateIdentifier not supported yet.')
   }
 
@@ -44,6 +47,26 @@ export class WebDIDProvider extends AbstractIdentifierProvider {
       await context.agent.keyManagerDelete({ kid })
     }
     return true
+  }
+
+  /**
+   * @remarks This method has not yet been implemented for WebDIDProvider
+   **/
+  async submitTransaction(
+    _args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    _context: IContext,
+  ): Promise<any> {
+    throw new Error('not_supported: WebDIDProvider submitTransaction not supported yet.')
   }
 
   async addKey(

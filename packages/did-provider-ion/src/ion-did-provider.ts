@@ -174,6 +174,26 @@ export class IonDIDProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  /**
+   * @remarks This method has not yet been implemented for IonDIDProvider
+   **/
+  async submitTransaction(
+    _args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    _context: IContext,
+  ): Promise<any> {
+    throw new Error('not_supported: IonDIDProvider submitTransaction not supported yet.')
+  }
+
   /** {@inheritDoc @veramo/core-types#IDIDManager.didManagerAddKey} */
   async addKey(
     { identifier, key, options }: { identifier: IIdentifier; key: IKey; options?: IAddKeyOpts },
@@ -426,8 +446,8 @@ export class IonDIDProvider extends AbstractIdentifierProvider {
     const type = options?.type
       ? options.type
       : options?.key?.type
-      ? (options.key.type as KeyType)
-      : KeyType.Secp256k1
+        ? (options.key.type as KeyType)
+        : KeyType.Secp256k1
 
     const meta = options?.key?.meta ? options.key.meta : {}
     const ionMeta: IonKeyMetadata = {

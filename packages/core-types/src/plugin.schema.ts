@@ -1070,14 +1070,18 @@ export const schema = {
             },
             "options": {
               "type": "object",
+              "properties": {
+                "signOnly": {
+                  "type": "boolean"
+                }
+              },
               "description": "Optional. Identifier provider specific options"
             }
           },
           "required": [
             "did",
             "key"
-          ],
-          "description": "Input arguments for  {@link IDIDManager.didManagerAddKey | didManagerAddKey }"
+          ]
         },
         "IKey": {
           "type": "object",

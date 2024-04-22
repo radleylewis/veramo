@@ -48,8 +48,13 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
       context,
     )
 
-    const publicKeyHex = key.type === 'Secp256k1' ? SigningKey.computePublicKey('0x' + key.publicKeyHex, true) : key.publicKeyHex
-    const methodSpecificId: string = bytesToMultibase(hexToBytes(publicKeyHex), 'base58btc', keyCodecs[keyType])
+    const publicKeyHex =
+      key.type === 'Secp256k1' ? SigningKey.computePublicKey('0x' + key.publicKeyHex, true) : key.publicKeyHex
+    const methodSpecificId: string = bytesToMultibase(
+      hexToBytes(publicKeyHex),
+      'base58btc',
+      keyCodecs[keyType],
+    )
 
     const identifier: Omit<IIdentifier, 'provider'> = {
       did: 'did:key:' + methodSpecificId,
@@ -78,6 +83,26 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
       await context.agent.keyManagerDelete({ kid })
     }
     return true
+  }
+
+  /**
+   * @remarks This method has not yet been implemented for KeyDIDProvider
+   **/
+  async submitTransaction(
+    _args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    _context: IContext,
+  ): Promise<any> {
+    throw Error('KeyDIDProvider submitTransaction not supported')
   }
 
   async addKey(

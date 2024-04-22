@@ -66,6 +66,23 @@ export class FakeDidProvider extends AbstractIdentifierProvider {
     return true
   }
 
+  async submitTransaction(
+    args: {
+      identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+    },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<any> {
+    throw new Error('FakeDIDProvider submitTransaction not supported yet.')
+  }
+
   async addKey(
     { identifier, key, options }: { identifier: IIdentifier; key: IKey; options?: any },
     context: IAgentContext<IKeyManager>,
