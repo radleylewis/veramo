@@ -356,6 +356,10 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
     }
   }
 
+  /**
+   * @remarks This method submits transactions signed in Add/Remove Key/Service methods that
+   * have been prepared with the signOnly option flag.
+   **/
   async submitTransaction(
     {
       txnParams,
