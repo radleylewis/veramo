@@ -48,6 +48,7 @@ export interface TransactionOptions extends TransactionRequest {
   metaIdentifierKeyId?: string
   signOnly?: boolean
   key?: Pick<IKey, 'type' | 'publicKeyHex'>
+  service?: Pick<IService, 'type' | 'serviceEndpoint'>
 }
 
 /**
@@ -565,7 +566,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
   ): Promise<string | RemoveTxnParams> {
     const ethrDid = await this.getEthrDidController(args.identifier, context)
 
-    const service = args.identifier.services.find((s) => s.id === args.id)
+    const service = args.options?.service || args.identifier.services.find((s) => s.id === args.id)
     if (!service) throw Error('Service not found')
 
     const attrName = 'did/svc/' + service.type
