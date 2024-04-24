@@ -1,4 +1,13 @@
-import { IAgentContext, IIdentifier, IKey, IKeyManager, IService, ManagedKeyInfo } from '@veramo/core-types'
+import {
+  AddTxnParams,
+  IAgentContext,
+  IIdentifier,
+  IKey,
+  IKeyManager,
+  IService,
+  ManagedKeyInfo,
+  RemoveTxnParams,
+} from '@veramo/core-types'
 import { AbstractIdentifierProvider } from '@veramo/did-manager'
 import { Provider, SigningKey, computeAddress, JsonRpcProvider, TransactionRequest, Signature } from 'ethers'
 import { KmsEthereumSigner } from './kms-eth-signer.js'
@@ -109,21 +118,6 @@ export interface EthrNetworkConfiguration {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [index: string]: any
 }
-
-type AddTxnParams = [
-  attrName: string,
-  attrValue: string,
-  ttl: number,
-  signature: { sigV: number; sigR: string; sigS: string },
-  options: Record<string, any>,
-]
-
-type RemoveTxnParams = [
-  attrName: string,
-  attrValue: string,
-  signature: { sigV: number; sigR: string; sigS: string },
-  options: Record<string, any>,
-]
 
 /**
  * {@link @veramo/did-manager#DIDManager} identifier provider for `did:ethr` identifiers
@@ -367,7 +361,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       txnParams,
       identifier,
       principalDid,
-    }: { identifier: IIdentifier; txnParams: AddTxnParams; principalDid?: string },
+    }: { identifier: IIdentifier; txnParams: AddTxnParams | RemoveTxnParams; principalDid?: string },
     context: IRequiredContext,
   ): Promise<string> {
     const metaIdentifierKeyId = identifier.keys.find((k) =>
@@ -385,8 +379,14 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       metaIdentifierKeyId,
       principalDid,
     )
-    const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
-    return txHash
+
+    /**
+     * NOTE: setAttributeSigned and revokeAttributeSigned take a different number of arguments
+     * depending on whether it is an add or remove operation. A length check differentiates
+     * the type union of the txnParams tuples passed as arguments
+     **/
+    if (txnParams.length === 5) return await metaEthrDid.setAttributeSigned(...txnParams)
+    else return await metaEthrDid.revokeAttributeSigned(...txnParams)
   }
 
   async addKey(
