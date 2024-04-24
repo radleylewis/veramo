@@ -1,4 +1,4 @@
-import { IAgentContext, IIdentifier, IKey, IKeyManager, IService } from '@veramo/core-types'
+import { IAgentContext, IIdentifier, IKey, IKeyManager, IService, ManagedKeyInfo } from '@veramo/core-types'
 import { AbstractIdentifierProvider } from '@veramo/did-manager'
 import { Provider, SigningKey, computeAddress, JsonRpcProvider, TransactionRequest, Signature } from 'ethers'
 import { KmsEthereumSigner } from './kms-eth-signer.js'
@@ -47,6 +47,7 @@ export interface TransactionOptions extends TransactionRequest {
   encoding?: string
   metaIdentifierKeyId?: string
   signOnly?: boolean
+  key?: Pick<IKey, 'type' | 'publicKeyHex'>
 }
 
 /**
@@ -367,7 +368,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       principalDid,
     }: { identifier: IIdentifier; txnParams: AddTxnParams; principalDid?: string },
     context: IRequiredContext,
-  ): Promise<any> {
+  ): Promise<string> {
     const metaIdentifierKeyId = identifier.keys.find((k) =>
       k.meta?.algorithms?.includes('eth_signTransaction'),
     )?.kid
@@ -506,7 +507,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
   ): Promise<string | RemoveTxnParams> {
     const ethrDid = await this.getEthrDidController(args.identifier, context)
 
-    const key = args.identifier.keys.find((k) => k.kid === args.kid)
+    const key = args.options?.key || args.identifier.keys.find((k) => k.kid === args.kid)
     if (!key) throw Error('Key not found')
 
     const usg = key.type === 'X25519' ? 'enc' : 'veriKey'
