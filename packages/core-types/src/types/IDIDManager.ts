@@ -153,16 +153,23 @@ export interface IDIDManagerUpdateArgs {
   }
 }
 
-type TxnParams = [
+export type AddTxnParams = [
   attrName: string,
   attrValue: string,
   ttl: number,
   signature: { sigV: number; sigR: string; sigS: string },
-  options: Record<string, any>,
+  options: Record<string, unknown>,
+]
+
+export type RemoveTxnParams = [
+  attrName: string,
+  attrValue: string,
+  signature: { sigV: number; sigR: string; sigS: string },
+  options: Record<string, unknown>,
 ]
 
 export interface IDIDManagerSubmitTransactionArgs {
-  txnParams: TxnParams
+  txnParams: AddTxnParams | RemoveTxnParams
   provider: string
   principalDid: string
   agentDid: string
@@ -376,19 +383,28 @@ export interface IDIDManager extends IPluginMethodMap {
    * Adds a key to a DID Document
    * @returns identifier provider specific response. Can be txHash, etc,
    */
-  didManagerAddKey(args: IDIDManagerAddKeyArgs, context: IAgentContext<IKeyManager>): Promise<any>
+  didManagerAddKey(
+    args: IDIDManagerAddKeyArgs,
+    context: IAgentContext<IKeyManager>,
+  ): Promise<(typeof args)['options'] extends { signOnly: true } ? AddTxnParams : string>
 
   /**
    * Removes a key from a DID Document
    * @returns identifier provider specific response. Can be txHash, etc,
    */
-  didManagerRemoveKey(args: IDIDManagerRemoveKeyArgs, context: IAgentContext<IKeyManager>): Promise<any> // txHash?
+  didManagerRemoveKey(
+    args: IDIDManagerRemoveKeyArgs,
+    context: IAgentContext<IKeyManager>,
+  ): Promise<(typeof args)['options'] extends { signOnly: true } ? RemoveTxnParams : string>
 
   /**
    * Adds a service to a DID Document
    * @returns identifier provider specific response. Can be txHash, etc,
    */
-  didManagerAddService(args: IDIDManagerAddServiceArgs, context: IAgentContext<IKeyManager>): Promise<any> //txHash?
+  didManagerAddService(
+    args: IDIDManagerAddServiceArgs,
+    context: IAgentContext<IKeyManager>,
+  ): Promise<(typeof args)['options'] extends { signOnly: true } ? AddTxnParams : string>
 
   /**
    * Removes a service from a DID Document
@@ -397,5 +413,5 @@ export interface IDIDManager extends IPluginMethodMap {
   didManagerRemoveService(
     args: IDIDManagerRemoveServiceArgs,
     context: IAgentContext<IKeyManager>,
-  ): Promise<any> //txHash?
+  ): Promise<(typeof args)['options'] extends { signOnly: true } ? RemoveTxnParams : string>
 }
