@@ -119,6 +119,21 @@ export interface EthrNetworkConfiguration {
   [index: string]: any
 }
 
+type AddTxnParams = [
+  attrName: string,
+  attrValue: string,
+  ttl: number,
+  signature: { sigV: number; sigR: string; sigS: string },
+  options: Record<string, any>,
+]
+
+type RemoveTxnParams = [
+  attrName: string,
+  attrValue: string,
+  signature: { sigV: number; sigR: string; sigS: string },
+  options: Record<string, any>,
+]
+
 /**
  * {@link @veramo/did-manager#DIDManager} identifier provider for `did:ethr` identifiers
  * @public

@@ -34,6 +34,22 @@ export abstract class AbstractIdentifierProvider {
   abstract submitTransaction(
     args: {
       identifier: IIdentifier
+      txnParams: [
+        attrName: string,
+        attrValue: string,
+        ttl: number,
+        signature: { sigV: number; sigR: string; sigS: string },
+        options: Record<string, any>,
+      ]
+      provider: string
+      principalDid?: string
+    },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<any>
+
+  abstract submitTransaction(
+    args: {
+      identifier: IIdentifier
       txnParams: AddTxnParams | RemoveTxnParams
       provider: string
       principalDid?: string
