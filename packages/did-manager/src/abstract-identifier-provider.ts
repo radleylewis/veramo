@@ -1,4 +1,13 @@
-import { IIdentifier, IKey, IService, IAgentContext, IKeyManager, DIDDocument } from '@veramo/core-types'
+import {
+  IIdentifier,
+  IKey,
+  IService,
+  IAgentContext,
+  IKeyManager,
+  DIDDocument,
+  AddTxnParams,
+  RemoveTxnParams,
+} from '@veramo/core-types'
 
 /**
  * An abstract class for the {@link @veramo/did-manager#DIDManager} identifier providers
@@ -37,6 +46,16 @@ export abstract class AbstractIdentifierProvider {
     },
     context: IAgentContext<IKeyManager>,
   ): Promise<any>
+
+  abstract submitTransaction(
+    args: {
+      identifier: IIdentifier
+      txnParams: AddTxnParams | RemoveTxnParams
+      provider: string
+      principalDid?: string
+    },
+    context: IAgentContext<IKeyManager>,
+  ): Promise<string>
 
   abstract removeKey(
     args: { identifier: IIdentifier; kid: string; options?: any },

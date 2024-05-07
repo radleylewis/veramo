@@ -1,4 +1,13 @@
-import { IAgentContext, IIdentifier, IKey, IKeyManager, IService } from '@veramo/core-types'
+import {
+  AddTxnParams,
+  IAgentContext,
+  IIdentifier,
+  IKey,
+  IKeyManager,
+  IService,
+  ManagedKeyInfo,
+  RemoveTxnParams,
+} from '@veramo/core-types'
 import { AbstractIdentifierProvider } from '@veramo/did-manager'
 import { Provider, SigningKey, computeAddress, JsonRpcProvider, TransactionRequest, Signature } from 'ethers'
 import { KmsEthereumSigner } from './kms-eth-signer.js'
@@ -47,6 +56,8 @@ export interface TransactionOptions extends TransactionRequest {
   encoding?: string
   metaIdentifierKeyId?: string
   signOnly?: boolean
+  key?: Pick<IKey, 'type' | 'publicKeyHex'>
+  service?: Pick<IService, 'type' | 'serviceEndpoint'>
 }
 
 /**
@@ -365,9 +376,9 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       txnParams,
       identifier,
       principalDid,
-    }: { identifier: IIdentifier; txnParams: AddTxnParams; principalDid?: string },
+    }: { identifier: IIdentifier; txnParams: AddTxnParams | RemoveTxnParams; principalDid?: string },
     context: IRequiredContext,
-  ): Promise<any> {
+  ): Promise<string> {
     const metaIdentifierKeyId = identifier.keys.find((k) =>
       k.meta?.algorithms?.includes('eth_signTransaction'),
     )?.kid
@@ -383,8 +394,14 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
       metaIdentifierKeyId,
       principalDid,
     )
-    const txHash = await metaEthrDid.setAttributeSigned(...txnParams)
-    return txHash
+
+    /**
+     * NOTE: setAttributeSigned and revokeAttributeSigned take a different number of arguments
+     * depending on whether it is an add or remove operation. A length check differentiates
+     * the type union of the txnParams tuples passed as arguments
+     **/
+    if (txnParams.length === 5) return await metaEthrDid.setAttributeSigned(...txnParams)
+    else return await metaEthrDid.revokeAttributeSigned(...txnParams)
   }
 
   async addKey(
@@ -506,7 +523,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
   ): Promise<string | RemoveTxnParams> {
     const ethrDid = await this.getEthrDidController(args.identifier, context)
 
-    const key = args.identifier.keys.find((k) => k.kid === args.kid)
+    const key = args.options?.key || args.identifier.keys.find((k) => k.kid === args.kid)
     if (!key) throw Error('Key not found')
 
     const usg = key.type === 'X25519' ? 'enc' : 'veriKey'
@@ -564,7 +581,7 @@ export class EthrDIDProvider extends AbstractIdentifierProvider {
   ): Promise<string | RemoveTxnParams> {
     const ethrDid = await this.getEthrDidController(args.identifier, context)
 
-    const service = args.identifier.services.find((s) => s.id === args.id)
+    const service = args.options?.service || args.identifier.services.find((s) => s.id === args.id)
     if (!service) throw Error('Service not found')
 
     const attrName = 'did/svc/' + service.type
